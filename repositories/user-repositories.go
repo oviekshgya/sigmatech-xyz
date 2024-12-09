@@ -268,3 +268,45 @@ func (service userRepositories) MasterMerchant(page, pageSize int) (interface{},
 		"totalPage": totalPage,
 	}, nil
 }
+
+func (service userRepositories) SimulasiTransaksi(idAkun int, input models.JSONTransaksiSimulasiPengajuan) (interface{}, error) {
+	if input.Request.Tenor != 3 || input.Request.Tenor != 5 {
+		return nil, fmt.Errorf("tenor hanya boleh 3 atau 5 tahun")
+	}
+
+	var dataMerchant master.MasterMerchants
+	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)
+
+	var dataRate master.MasterRates
+	service.DbMain.Where("isActive = 1").First(&dataRate)
+
+	var paymentSchedule []map[string]interface{}
+
+	var a = 1
+	tgljt := time.Now().AddDate(0, 0, 30)
+	for i := 0; i < input.Request.Tenor; i++ {
+
+		paymentSchedule = append(paymentSchedule, map[string]interface{}{
+			"angsuranKe":    a + 1,
+			"bunga":         dataRate.Rate / 12,
+			"tanggal":       time.Now(),
+			"tglJatuhTempo": tgljt,
+			"jumlahCicilan": input.Request.OTR / float64(input.Request.Tenor),
+			"totalCicilan":  (input.Request.OTR / float64(input.Request.Tenor)) + input.Request.OTR*((dataRate.Rate/12)/100)*float64(input.Request.Tenor),
+			"status":        "ready",
+		})
+		tgljt = tgljt.AddDate(0, 0, 30)
+	}
+
+	return map[string]interface{}{
+		"model":              input.Request.NamaAset,
+		"merchan":            dataMerchant.NamaMerchant,
+		"totalHutang":        (input.Request.OTR * (dataRate.Rate / 100) * float64(input.Request.Tenor)) + input.Request.OTR,
+		"tenor":              input.Request.Tenor,
+		"bunga":              input.Request.OTR * (dataRate.Rate / 100) * float64(input.Request.Tenor),
+		"tglJatuhTempoBulan": time.Now().AddDate(0, 0, 30).Format("2006-01-02"),
+		"tglJatuhTempo":      time.Now().AddDate(0, input.Request.Tenor, 0).Format("2006-01-02"),
+		"paymanetSchedule":   paymentSchedule,
+		"rate":               dataRate.Rate,
+	}, nil
+}

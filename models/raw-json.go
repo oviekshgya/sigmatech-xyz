@@ -34,3 +34,21 @@ type JSONVerifikasi struct {
 		IsAktivasi   int     `json:"isAktivasi"`
 	} `json:"request"`
 }
+
+type JSONTransaksiPengajuan struct {
+	Request struct {
+		OTR           float64 `json:"otr"`
+		AdminFee      float64 `json:"adminFee"`
+		JumlahCicilan float64 `json:"jumlahCicilan"`
+		JumlahBunga   float64 `json:"jumlahBunga"`
+		NamaAset      string  `json:"namaAset"`
+	} `json:"request"`
+}
+
+type JSONTransaksiSimulasiPengajuan struct {
+	Request struct {
+		OTR      float64 `json:"otr"`
+		Tenor    int     `json:"tenor"`
+		NamaAset string  `json:"namaAset"`
+	} `json:"request"`
+}

@@ -262,3 +262,37 @@ func (controller UsersController) MasterMerchant() {
 	appB.Response(http.StatusOK, "Success", "", result)
 	return
 }
+
+// SimulasiTransaksi
+// @Description SimulasiTransaksi
+// @Param	body	nil	true	"body nill"
+// @Success 200 {int} interfaces{}
+// @Failure 403 bodies are empty
+// @router /simulasi-transaksi [post]
+func (controller UsersController) SimulasiTransaksi() {
+	appB := httpresponses.Bee{
+		Ctx: controller.Ctx,
+	}
+
+	meta, errMeta := auth.ExtractedExt(controller.Ctx.Request, "")
+	if errMeta != nil {
+		appB.Response(http.StatusUnauthorized, "", errMeta.Error(), nil)
+		return
+	}
+
+	var input models.JSONTransaksiSimulasiPengajuan
+	if err := json.Unmarshal([]byte((controller.Ctx.Input.GetData("RequestBody").(string))), &input); err != nil {
+		fmt.Println("err", err)
+		appB.Response(http.StatusUnprocessableEntity, "", err.Error(), nil)
+		return
+	}
+
+	result, err2 := repositories.StaticUserRepositoris().SimulasiTransaksi(meta.Id, input)
+	if err2 != nil {
+		appB.Response(http.StatusBadRequest, "", "email / password salah", nil)
+		return
+	}
+
+	appB.Response(http.StatusOK, "Success", "", result)
+	return
+}
