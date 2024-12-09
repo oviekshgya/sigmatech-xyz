@@ -399,6 +399,12 @@ func (service UserRepositories) Transaksi(idAkun int, input models.JSONTransaksi
 
 func (service UserRepositories) CheckPengajuan(idAkun int, noKontrak string) (interface{}, error) {
 	var data transaksi.DataTransaksi
-	service.DbMain.Table(pkg.TRANSACTION+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idUserCustomer = a.idUserCustomer").Joins("INNER JOIN "+pkg.AKUNCUSTOMER+" as c ON c.idAkun = b.idAkun").Where("c.idAkun = ? AND a.noKontrak = ?", idAkun, noKontrak).Select("a.status = 'Aktif'").Select("a.status, a.noKontrak, a.otr, a.tglJatuhTempo, a.jumlahCicilan").Take(&data)
+	service.DbMain.Table(pkg.TRANSACTION+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idUserCustomer = a.idUserCustomer").Joins("INNER JOIN "+pkg.AKUNCUSTOMER+" as c ON c.idAkun = b.idAkun").Where("c.idAkun = ? AND a.noKontrak = ?", idAkun, noKontrak).Select("a.status = 'Aktif'").Select("a.status, a.noKontrak, a.otr, a.tglJatuhTempo, a.jumlahCicilan, a.idTransaksi").Take(&data)
+
+	var dataPaymet []transaksi.PaymentTransaksi
+	if service.DbMain.Where("idTransaksi = ?", data.IdTransaksi).Find(&dataPaymet); len(dataPaymet) > 0 {
+		data.PaymentSchedule = dataPaymet
+	}
+
 	return &data, nil
 }

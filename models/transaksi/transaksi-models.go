@@ -45,9 +45,11 @@ func (PaymentTransaksi) TableName() string {
 }
 
 type DataTransaksi struct {
-	Status        string    `gorm:"column:status;size:200" json:"status"`
-	NoKontrak     string    `gorm:"column:noKontrak;size:200" json:"noKontrak"`
-	OTR           float64   `gorm:"column:otr;type:double" json:"otr"`
-	TglJatuhTempo time.Time `gorm:"column:tglJatuhTempo;type:date"`
-	JumlahCicilan float64   `gorm:"column:jumlahCicilan;type:double" json:"jumlahCicilan"`
+	IdTransaksi     int         `gorm:"column:idTransaksi" json:"-"`
+	Status          string      `gorm:"column:status;size:200" json:"status"`
+	NoKontrak       string      `gorm:"column:noKontrak;size:200" json:"noKontrak"`
+	OTR             float64     `gorm:"column:otr;type:double" json:"otr"`
+	TglJatuhTempo   time.Time   `gorm:"column:tglJatuhTempo;type:date"`
+	JumlahCicilan   float64     `gorm:"column:jumlahCicilan;type:double" json:"jumlahCicilan"`
+	PaymentSchedule interface{} `gorm:"-" json:"paymentSchedule,omitempty"`
 }
