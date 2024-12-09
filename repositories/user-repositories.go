@@ -6,6 +6,7 @@ import (
 	database "sigmatech-xyz/db"
 	"sigmatech-xyz/models"
 	"sigmatech-xyz/models/master"
+	"sigmatech-xyz/models/transaksi"
 	"sigmatech-xyz/models/users"
 	"sigmatech-xyz/pkg"
 	"sync"
@@ -186,7 +187,7 @@ func (service userRepositories) VerifikasiAkun(idAkun int, input models.JSONVeri
 			for jobs := range job {
 				tx := service.DbMain.Begin()
 				defer wg.Done()
-				if created := tx.Create(&users.UserCustomer{
+				dataCreated := users.UserCustomer{
 					IdAkun:       idAkun,
 					CreatedAt:    time.Now(),
 					UpdatedAt:    time.Now(),
@@ -198,11 +199,23 @@ func (service userRepositories) VerifikasiAkun(idAkun int, input models.JSONVeri
 					Salary:       input.Request.Salary,
 					TanggalLahir: time.Now(),
 					TempatLahir:  input.Request.TempatLahir,
+				}
+				if created := tx.Create(&dataCreated); created.Error != nil {
+					tx.Rollback()
+					jobs.Error <- fmt.Errorf("insert error:%s", created.Error.Error())
+					return
+				}
+				if created := tx.Create(&users.UserLimits{
+					CreatedAt:      time.Now(),
+					UpdatedAt:      time.Now(),
+					Limit:          100000,
+					IdUserCustomer: dataCreated.IdUserCustomer,
 				}); created.Error != nil {
 					tx.Rollback()
 					jobs.Error <- fmt.Errorf("insert error:%s", created.Error.Error())
 					return
 				}
+
 				tx.Commit()
 				jobs.Result <- map[string]interface{}{
 					"insert": true,
@@ -305,6 +318,80 @@ func (service userRepositories) SimulasiTransaksi(idAkun int, input models.JSONT
 		"tglJatuhTempoBulan": time.Now().AddDate(0, 0, 30).Format("2006-01-02"),
 		"tglJatuhTempo":      time.Now().AddDate(0, input.Request.Tenor, 0).Format("2006-01-02"),
 		"paymanetSchedule":   paymentSchedule,
+		"rate":               dataRate.Rate,
+	}, nil
+}
+
+func (service userRepositories) Transaksi(idAkun int, input models.JSONTransaksi) (interface{}, error) {
+	var dataMerchant master.MasterMerchants
+	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)
+
+	var dataLimit users.UserLimits
+	if service.DbMain.Table(pkg.AKUNCUSTOMER+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idAkun = a.idAkun").Joins("INNER JOIN "+pkg.USERLIMIT+" as c ON c.idUserCustomer = b.idUserCustomer").Where("b.idUserCustomer = ?", idAkun).Select("c.limit, b.idUserCustomer").First(&dataLimit); input.Request.OTR > dataLimit.Limit {
+		return nil, fmt.Errorf("maaf transaksi anda melebihi limit transaksi %f", dataLimit.Limit)
+	}
+
+	var dataRate master.MasterRates
+	service.DbMain.First(&dataRate)
+
+	tx := service.DbMain.Begin()
+
+	dataCreated := transaksi.Transaksi{
+		OTR:            input.Request.OTR,
+		UpdatedAt:      time.Now(),
+		CreatedAt:      time.Now(),
+		Tenor:          input.Request.Tenor,
+		NamaAset:       input.Request.NamaAset,
+		IdUserCustomer: dataLimit.IdUserCustomer,
+		AdminFee:       dataRate.Admin,
+		IdMerchant:     input.Request.IdMerchant,
+		JumlahBunga:    input.Request.OTR * (dataRate.Rate / 100) * float64(input.Request.Tenor),
+		JumlahCicilan:  input.Request.OTR / float64(input.Request.Tenor) * 12,
+		NoKontrak:      pkg.KodeVerify(10),
+		Status:         "Pengajuan",
+	}
+
+	if created := tx.Create(&dataCreated); created.Error != nil {
+		tx.Rollback()
+		return nil, created.Error
+	}
+
+	var a = 1
+	tgljt := time.Now().AddDate(0, 0, 30)
+	var paymentTransaksi []transaksi.PaymentTransaksi
+	for i := 0; i < input.Request.Tenor*12; i++ {
+		paymentTransaksi = append(paymentTransaksi, transaksi.PaymentTransaksi{
+			Status:            dataCreated.Status,
+			CreatedAt:         time.Now(),
+			UpdatedAt:         time.Now(),
+			JumlahCicilan:     input.Request.OTR / float64(input.Request.Tenor) * 12,
+			Bunga:             dataRate.Rate / 12,
+			IdTransaksi:       dataCreated.IdTransaksi,
+			AngsuranKe:        a,
+			Tanggal:           time.Now(),
+			TanggalJatuhTempo: tgljt,
+			TotalCicilan:      (input.Request.OTR / float64(input.Request.Tenor)) + input.Request.OTR*((dataRate.Rate/12)/100)*float64(input.Request.Tenor),
+		})
+		tgljt = tgljt.AddDate(0, 0, 30)
+		a++
+	}
+
+	if creratePayment := tx.Create(&paymentTransaksi); creratePayment.Error != nil {
+		tx.Rollback()
+		return nil, creratePayment.Error
+	}
+
+	tx.Commit()
+
+	return map[string]interface{}{
+		"model":              input.Request.NamaAset,
+		"merchan":            dataMerchant.NamaMerchant,
+		"totalHutang":        (input.Request.OTR * (dataRate.Rate / 100) * float64(input.Request.Tenor)) + input.Request.OTR,
+		"tenor":              input.Request.Tenor,
+		"bunga":              input.Request.OTR * (dataRate.Rate / 100) * float64(input.Request.Tenor),
+		"tglJatuhTempoBulan": time.Now().AddDate(0, 0, 30).Format("2006-01-02"),
+		"tglJatuhTempo":      time.Now().AddDate(0, input.Request.Tenor, 0).Format("2006-01-02"),
+		"paymanetSchedule":   paymentTransaksi,
 		"rate":               dataRate.Rate,
 	}, nil
 }

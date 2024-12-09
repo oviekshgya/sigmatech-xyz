@@ -52,3 +52,12 @@ type JSONTransaksiSimulasi struct {
 		NamaAset string  `json:"namaAset"`
 	} `json:"request"`
 }
+
+type JSONTransaksi struct {
+	Request struct {
+		OTR        float64 `json:"otr"`
+		Tenor      int     `json:"tenor"`
+		NamaAset   string  `json:"namaAset"`
+		IdMerchant int     `json:"idMerchant"`
+	} `json:"request"`
+}
