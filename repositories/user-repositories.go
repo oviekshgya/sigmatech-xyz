@@ -211,3 +211,22 @@ func (service userRepositories) VerifikasiAkun(idAkun int, input models.JSONVeri
 		}()
 	}
 }
+
+type ProfileJob struct {
+	Result chan interface{}
+	Error  chan error
+}
+
+func (service userRepositories) Profile(idAkun int, job <-chan ProfileJob, wg *sync.WaitGroup) {
+	for i := 1; i <= NumWorkers; i++ {
+		go func() {
+			for jobs := range job {
+				defer wg.Done()
+				var data users.UserCustomerData
+				service.DbMain.Table(pkg.AKUNCUSTOMER).Preload("Data").Where("idAkun = ?", idAkun).First(&data)
+				jobs.Result <- data
+				return
+			}
+		}()
+	}
+}

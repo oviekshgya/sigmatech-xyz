@@ -52,3 +52,19 @@ type OTPCustomer struct {
 func (OTPCustomer) TableName() string {
 	return pkg.OTPCUSTOMERS
 }
+
+type UserCustomerData struct {
+	IdAkun      int           `gorm:"column:idAkun;primaryKey;autoIncrement" json:"idAkun"`
+	NamaLengkap string        `gorm:"column:namaLengkap;size:255" json:"namaLengkap"`
+	Hp          string        `gorm:"column:hp;size:20" json:"hp"`
+	Password    string        `gorm:"column:password;size:255" json:"password"`
+	Email       string        `gorm:"column:email;size:255" json:"email"`
+	IsActive    int           `gorm:"column:isActive" json:"isActive"`
+	CreatedAt   time.Time     `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt   time.Time     `gorm:"updated_at;autoUpdateTime"`
+	Data        *UserCustomer `gorm:"foreignKey:idAkun;references:IdAkun" json:"data"`
+}
+
+func (UserCustomerData) TableName() string {
+	return pkg.AKUNCUSTOMER
+}

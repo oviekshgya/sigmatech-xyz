@@ -191,3 +191,44 @@ func (controller UsersController) VerifikasiAkun() {
 		appB.Response(http.StatusBadRequest, "Unknown Error", "", nil)
 	}
 }
+
+// Profile
+// @Description Profile
+// @Param	body	nil	true	"body nill"
+// @Success 200 {int} interfaces{}
+// @Failure 403 bodies are empty
+// @router /profile [post]
+func (controller UsersController) Profile() {
+	appB := httpresponses.Bee{
+		Ctx: controller.Ctx,
+	}
+
+	meta, errMeta := auth.ExtractedExt(controller.Ctx.Request, "")
+	if errMeta != nil {
+		appB.Response(http.StatusUnauthorized, "", errMeta.Error(), nil)
+		return
+	}
+	jobs := make(chan repositories.ProfileJob, repositories.QueueSizes)
+	results := make(chan interface{}, repositories.QueueSizes)
+	errChan := make(chan error, 1)
+	var wg sync.WaitGroup
+
+	go repositories.StaticUserRepositoris().Profile(meta.Id, jobs, &wg)
+
+	wg.Add(1)
+	jobs <- repositories.ProfileJob{
+		Result: results,
+		Error:  errChan,
+	}
+	close(jobs)
+	wg.Wait()
+
+	select {
+	case res := <-results:
+		appB.Response(http.StatusCreated, "Success", "", res)
+	case err := <-errChan:
+		appB.Response(http.StatusInternalServerError, "", err.Error(), nil)
+	default:
+		appB.Response(http.StatusBadRequest, "Unknown Error", "", nil)
+	}
+}
