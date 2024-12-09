@@ -270,15 +270,12 @@ func (service userRepositories) MasterMerchant(page, pageSize int) (interface{},
 }
 
 func (service userRepositories) SimulasiTransaksi(idAkun int, input models.JSONTransaksiSimulasiPengajuan) (interface{}, error) {
-	if input.Request.Tenor != 3 || input.Request.Tenor != 5 {
-		return nil, fmt.Errorf("tenor hanya boleh 3 atau 5 tahun")
-	}
 
 	var dataMerchant master.MasterMerchants
 	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)
 
 	var dataRate master.MasterRates
-	service.DbMain.Where("isActive = 1").First(&dataRate)
+	service.DbMain.First(&dataRate)
 
 	var paymentSchedule []map[string]interface{}
 
@@ -296,6 +293,7 @@ func (service userRepositories) SimulasiTransaksi(idAkun int, input models.JSONT
 			"status":        "ready",
 		})
 		tgljt = tgljt.AddDate(0, 0, 30)
+		a++
 	}
 
 	return map[string]interface{}{

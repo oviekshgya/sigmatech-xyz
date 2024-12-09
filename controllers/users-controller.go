@@ -289,7 +289,7 @@ func (controller UsersController) SimulasiTransaksi() {
 
 	result, err2 := repositories.StaticUserRepositoris().SimulasiTransaksi(meta.Id, input)
 	if err2 != nil {
-		appB.Response(http.StatusBadRequest, "", "email / password salah", nil)
+		appB.Response(http.StatusBadRequest, "", err2.Error(), nil)
 		return
 	}
 
