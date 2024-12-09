@@ -68,3 +68,14 @@ type UserCustomerData struct {
 func (UserCustomerData) TableName() string {
 	return pkg.AKUNCUSTOMER
 }
+
+type UserLimits struct {
+	IdUserLimit int       `gorm:"column:idUserLimit;primaryKey" json:"idUserLimit"`
+	Limit       float64   `gorm:"column:limit;type:double" json:"limit"`
+	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt   time.Time `gorm:"updated_at;autoUpdateTime"`
+}
+
+func (UserLimits) TableName() string {
+	return pkg.USERLIMIT
+}

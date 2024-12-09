@@ -59,7 +59,7 @@ func ConectionGORM() *gorm.DB {
 		Logger: newLogger,
 	})
 
-	DBMain.AutoMigrate(&users.UserCustomer{}, &users.AkunCustomer{}, &transaksi.Transaksi{}, &transaksi.PaymentTransaksi{}, &master.MasterMerchants{}, &master.MasterRates{}, &users.OTPCustomer{}, &logging.MasterLog{})
+	DBMain.AutoMigrate(&users.UserCustomer{}, &users.AkunCustomer{}, &transaksi.Transaksi{}, &transaksi.PaymentTransaksi{}, &master.MasterMerchants{}, &master.MasterRates{}, &users.OTPCustomer{}, &logging.MasterLog{}, &users.UserLimits{})
 
 	// Konfigurasi pool koneksi
 	sqlDB, _ := DBMain.DB()

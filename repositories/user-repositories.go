@@ -269,7 +269,7 @@ func (service userRepositories) MasterMerchant(page, pageSize int) (interface{},
 	}, nil
 }
 
-func (service userRepositories) SimulasiTransaksi(idAkun int, input models.JSONTransaksiSimulasiPengajuan) (interface{}, error) {
+func (service userRepositories) SimulasiTransaksi(idAkun int, input models.JSONTransaksiSimulasi) (interface{}, error) {
 
 	var dataMerchant master.MasterMerchants
 	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)

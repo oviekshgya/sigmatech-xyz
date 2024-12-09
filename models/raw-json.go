@@ -45,7 +45,7 @@ type JSONTransaksiPengajuan struct {
 	} `json:"request"`
 }
 
-type JSONTransaksiSimulasiPengajuan struct {
+type JSONTransaksiSimulasi struct {
 	Request struct {
 		OTR      float64 `json:"otr"`
 		Tenor    int     `json:"tenor"`

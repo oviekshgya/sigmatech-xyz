@@ -22,4 +22,5 @@ const (
 	RATE             = "rate"
 	LOG              = "log"
 	OTPCUSTOMERS     = "otp_customer"
+	USERLIMIT        = "user_limit"
 )
