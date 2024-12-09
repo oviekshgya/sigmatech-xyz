@@ -14,6 +14,7 @@ import (
 	"sigmatech-xyz/models/master"
 	"sigmatech-xyz/models/transaksi"
 	"sigmatech-xyz/models/users"
+
 	"sigmatech-xyz/pkg/cronjobs"
 	"time"
 )
@@ -95,11 +96,18 @@ func CronsStart() {
 		fmt.Println(err)
 	}
 	ctx, _ := context.WithCancel(context.Background())
-	scheduler.Every(1).Seconds().Do(Scheduler, time.Now().Format("15:04"))
+	scheduler.Every(10).Seconds().Do(Scheduler, time.Now().Format("15:04"))
 	//scheduler.Every(30).Minutes().Do(SchedulerKhusus, time.Now().Format("15:04"))
 	scheduler.Start(ctx)
 }
 
 func Scheduler(num string) {
-	fmt.Println("INTERVAL RUN 1 SECOND")
+	tx := DBMain.Begin()
+	if created := tx.Table("user_customer").Where("isAktivasi = ? ", 0).Updates(map[string]interface{}{
+		"isAktivasi": 1,
+	}); created.Error != nil {
+		tx.Rollback()
+		return
+	}
+	tx.Commit()
 }
