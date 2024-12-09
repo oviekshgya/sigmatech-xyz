@@ -8,6 +8,7 @@ import (
 type UserCustomer struct {
 	IdUserCustomer int       `gorm:"column:idUserCustomer;primaryKey;autoIncrement" json:"idUserCustomer"`
 	Nik            string    `gorm:"column:nik;size:100" json:"nik"`
+	IdAkun         int       `gorm:"column:idAkun;foreignKey" json:"idAkun"`
 	NamaLengkap    string    `gorm:"column:namaLengkap;size:255" json:"namaLengkap"`
 	LegalName      string    `gorm:"column:legalName;size:255" json:"legalName"`
 	TempatLahir    string    `gorm:"column:tempatLahir;size:100" json:"tempatLahir"`
@@ -25,14 +26,13 @@ func (UserCustomer) TableName() string {
 }
 
 type AkunCustomer struct {
-	IdAkun         int       `gorm:"column:idAkun;primaryKey;autoIncrement" json:"idAkun"`
-	IdUserCustomer int       `gorm:"column:idUserCustomer;foreignKey" json:"idUserCustomer"`
-	Hp             string    `gorm:"column:hp;size:20" json:"hp"`
-	Password       string    `gorm:"column:password;size:255" json:"password"`
-	Email          string    `gorm:"column:email;size:255" json:"email"`
-	IsActive       int       `gorm:"column:isActive" json:"isActive"`
-	CreatedAt      time.Time `gorm:"column:created_at;autoCreateTime"`
-	UpdatedAt      time.Time `gorm:"updated_at;autoUpdateTime"`
+	IdAkun    int       `gorm:"column:idAkun;primaryKey;autoIncrement" json:"idAkun"`
+	Hp        string    `gorm:"column:hp;size:20" json:"hp"`
+	Password  string    `gorm:"column:password;size:255" json:"password"`
+	Email     string    `gorm:"column:email;size:255" json:"email"`
+	IsActive  int       `gorm:"column:isActive" json:"isActive"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt time.Time `gorm:"updated_at;autoUpdateTime"`
 }
 
 func (AkunCustomer) TableName() string {

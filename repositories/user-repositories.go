@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"fmt"
+	"golang.org/x/crypto/bcrypt"
 	database "sigmatech-xyz/db"
 	"sigmatech-xyz/models"
 	"sigmatech-xyz/models/users"
@@ -85,6 +86,70 @@ func (service userRepositories) RequestOTPCustomer(input models.JSONRequestOTP, 
 				tx.Commit()
 				job.Result <- map[string]interface{}{
 					"kode": kode,
+				}
+
+			}
+
+		}()
+	}
+
+}
+
+type ValidasiOTPJobs struct {
+	Result chan interface{}
+	Error  chan error
+}
+
+func (service userRepositories) ValidasiOTPCustomers(input models.JSONValidasiOTP, jobs <-chan ValidasiOTPJobs, wg *sync.WaitGroup) {
+	for i := 1; i <= NumWorkers; i++ {
+		go func() {
+			for job := range jobs {
+				tx := service.DbMain.Begin()
+				defer wg.Done()
+				var data users.OTPCustomer
+				tx.Table(pkg.OTPCUSTOMERS).Where("email = ? AND isUsed = 0 AND kode = ? ", input.Request.Email, input.Request.Otp).Select("idOtp, expiredAt").Take(&data)
+				if data.IdOtp == 0 {
+					tx.Rollback()
+					job.Error <- fmt.Errorf("kode otp salah")
+					return
+				}
+
+				if time.Now().After(data.ExpiredAt) {
+					tx.Rollback()
+					job.Error <- fmt.Errorf("kode otp expired")
+					return
+				}
+
+				if updated := tx.Table(pkg.OTPCUSTOMERS).Where("email = ? AND isUsed = 0 AND kode = ?", input.Request.Email, input.Request.Otp).Updates(map[string]interface{}{
+					"isUsed": 1,
+				}); updated.Error != nil {
+					tx.Rollback()
+					job.Error <- fmt.Errorf("resend update otp error:%s", updated.Error.Error())
+					return
+				}
+
+				hash, err := bcrypt.GenerateFromPassword([]byte(input.Request.Password), bcrypt.DefaultCost)
+				if err != nil {
+					tx.Rollback()
+					job.Error <- fmt.Errorf("hash failed:%s", err.Error())
+				}
+
+				if created := tx.Create(&users.AkunCustomer{
+					Email:     input.Request.Email,
+					Hp:        input.Request.Hp,
+					UpdatedAt: time.Now(),
+					CreatedAt: time.Now(),
+					IsActive:  1,
+					Password:  string(hash),
+				}); created.Error != nil {
+					tx.Rollback()
+					job.Error <- fmt.Errorf("created akun error:%s", created.Error.Error())
+					return
+				}
+
+				tx.Commit()
+				job.Result <- map[string]interface{}{
+					"kode": true,
 				}
 
 			}
