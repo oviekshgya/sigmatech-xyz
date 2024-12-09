@@ -12,9 +12,9 @@ services:
     working_dir: /go/src/gitlab.com/shagya/sigmatech-xyz
     command: go run main.go
     ports:
-      - "${SMFLEADS_USER_PORT}:${SMFLEADS_USER_PORT}"
+      - "3012:3012"
     expose:
-      - "${SMFLEADS_USER_PORT}"
+      - "3012"
     environment:
       TZ: Asia/Jakarta
       VIRTUAL_HOST: https://docker-dev.shagya.co.id/sigmatech-xyz
