@@ -420,7 +420,12 @@ func (service UserRepositories) PaymentAngsuran(idAkun int, input models.JSONTra
 
 func (service UserRepositories) CheckPayment(idAkun, angsurnaKe int, noKontrak string) (interface{}, error) {
 	var dataPaymet []transaksi.CheckPayment
-	service.DbMain.Table(pkg.TRANSACTION+" as a ").Joins("INNER JOIN "+pkg.PAYMENTTRANSAKSI+" as b ON b.idTransaksi = a.idTransaksi").Where("a.noKontrak = ? AND b.angsuranKe = ?", noKontrak, angsurnaKe).Select("a.noKontrak, b.angsuranKe, b.status, b.tglBayar").Find(&dataPaymet)
+	service.DbMain.Table(pkg.TRANSACTION + " as a ").Joins("INNER JOIN " + pkg.PAYMENTTRANSAKSI + " as b ON b.idTransaksi = a.idTransaksi").Scopes(func(db *gorm.DB) *gorm.DB {
+		if angsurnaKe != 0 {
+			return db.Where("a.noKontrak = ? AND b.angsuranKe = ?", noKontrak, angsurnaKe)
+		}
+		return db
+	}).Select("a.noKontrak, b.angsuranKe, b.status, b.tglBayar").Find(&dataPaymet)
 
 	return &dataPaymet, nil
 }
