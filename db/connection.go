@@ -96,7 +96,7 @@ func CronsStart() {
 		fmt.Println(err)
 	}
 	ctx, _ := context.WithCancel(context.Background())
-	scheduler.Every(10).Seconds().Do(Scheduler, time.Now().Format("15:04"))
+	scheduler.Every(10).Minutes().Do(Scheduler, time.Now().Format("15:04"))
 	//scheduler.Every(30).Minutes().Do(SchedulerKhusus, time.Now().Format("15:04"))
 	scheduler.Start(ctx)
 }

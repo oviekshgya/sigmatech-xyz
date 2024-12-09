@@ -245,7 +245,7 @@ func (service userRepositories) MasterMerchant(page, pageSize int) (interface{},
 	}
 
 	service.DbMain.Scopes(models.Pagination(pageSize, page)).Where("isActive = 1").Order("namaMerchant DESC").Find(&data)
-	service.DbMain.Where("isActive = 1").Count(&totalData)
+	service.DbMain.Table(pkg.MERCHANT).Where("isActive = 1").Count(&totalData)
 
 	if int(totalData) < pageSize {
 		totalPage = 1

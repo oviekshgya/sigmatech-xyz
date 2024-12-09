@@ -6,6 +6,7 @@ import (
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/go-playground/validator/v10"
 	"net/http"
+	"sigmatech-xyz/models"
 
 	"sigmatech-xyz/pkg"
 	"sigmatech-xyz/pkg/auth"
