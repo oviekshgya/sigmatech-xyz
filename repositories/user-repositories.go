@@ -421,3 +421,10 @@ func (service UserRepositories) PaymentAngsuran(idAkun int, input models.JSONTra
 
 	return nil, nil
 }
+
+func (service UserRepositories) CheckPayment(idAkun, angsurnaKe int, noKontrak string) (interface{}, error) {
+	var dataPaymet []transaksi.CheckPayment
+	service.DbMain.Table(pkg.TRANSACTION+" as a ").Joins("INNER JOIN "+pkg.PAYMENTTRANSAKSI+" as b ON b.idTransaksi = a.idTransaksi").Where("a.noKontrak = ? AND b.angsuranKe = ?", noKontrak, angsurnaKe).Select("a.noKontrak, b.angsuranKe, b.status, b.tglBayar").Find(&dataPaymet)
+
+	return &dataPaymet, nil
+}

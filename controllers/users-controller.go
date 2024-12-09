@@ -357,3 +357,31 @@ func (controller UsersController) CheckPengajuan() {
 	appB.Response(http.StatusOK, "Success", "", result)
 	return
 }
+
+// CheckPayment
+// @Description CheckPayment
+// @Param	body	nil	true	"body nill"
+// @Success 200 {int} interfaces{}
+// @Failure 403 bodies are empty
+// @router /check-payment/:noKontrak/:angsuranke [get]
+func (controller UsersController) CheckPayment() {
+	appB := httpresponses.Bee{
+		Ctx: controller.Ctx,
+	}
+
+	meta, errMeta := auth.ExtractedExt(controller.Ctx.Request, "")
+	if errMeta != nil {
+		appB.Response(http.StatusUnauthorized, "", errMeta.Error(), nil)
+		return
+	}
+	angsuranKe, _ := strconv.Atoi(controller.Ctx.Input.Param(":angsuranke"))
+
+	result, err2 := repositories.StaticUserRepositoris().CheckPayment(meta.Id, angsuranKe, controller.Ctx.Input.Param(":noKontrak"))
+	if err2 != nil {
+		appB.Response(http.StatusBadRequest, "", err2.Error(), nil)
+		return
+	}
+
+	appB.Response(http.StatusOK, "Success", "", result)
+	return
+}
