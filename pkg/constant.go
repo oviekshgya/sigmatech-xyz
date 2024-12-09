@@ -12,3 +12,13 @@ const (
 	PASSWORD  = "sdadasd32ui2jn13we@#EDSFER#sdfsdf"
 	HEADERKEY = "k0iHVwz6dFPwkTxDE8fNZG07hGEh9VWPDSDFS"
 )
+
+const (
+	USERSCUSTOMER    = "user_customer"
+	TRANSACTION      = "transaksi"
+	PAYMENTTRANSAKSI = "payment_transaksi"
+	AKUNCUSTOMER     = "akun_customer"
+	MERCHANT         = "master"
+	RATE             = "rate"
+	LOG              = "log"
+)

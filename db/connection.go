@@ -9,6 +9,9 @@ import (
 	"gorm.io/gorm/logger"
 	"log"
 	"os"
+	"sigmatech-xyz/models/master"
+	"sigmatech-xyz/models/transaksi"
+	"sigmatech-xyz/models/users"
 	"time"
 )
 
@@ -51,6 +54,8 @@ func ConectionGORM() *gorm.DB {
 	DBMain, err = gorm.Open(grmsql.Open(addr), &gorm.Config{
 		Logger: newLogger,
 	})
+
+	DBMain.AutoMigrate(&users.UserCustomer{}, &users.AkunCustomer{}, &transaksi.Transaksi{}, &transaksi.PaymentTransaksi{}, &master.MasterMerchant{}, &master.MasterRate{})
 
 	// Konfigurasi pool koneksi
 	sqlDB, _ := DBMain.DB()
