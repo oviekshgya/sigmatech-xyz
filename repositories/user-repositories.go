@@ -413,13 +413,14 @@ func (service UserRepositories) CheckPengajuan(idAkun int, noKontrak string) (in
 func (service UserRepositories) PaymentAngsuran(idAkun int, input models.JSONTransaksiPayment) (interface{}, error) {
 	joins := strings.Join(input.Request.DetailAngsuran, "")
 	var data transaksi.DataTransaksi
-	service.DbMain.Table(pkg.TRANSACTION+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idUserCustomer = a.idUserCustomer").Joins("INNER JOIN "+pkg.AKUNCUSTOMER+" as c ON c.idAkun = b.idAkun").Where("c.idAkun = ? AND a.noKontrak = ?", idAkun, input.Request.NoKontrak).Select("a.status = 'Aktif'").Select("a.status, a.noKontrak, a.otr, a.tglJatuhTempo, a.jumlahCicilan, a.idTransaksi").Take(&data)
-	if data.Status != "" {
+	service.DbMain.Table(pkg.TRANSACTION+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idUserCustomer = a.idUserCustomer").Joins("INNER JOIN "+pkg.AKUNCUSTOMER+" as c ON c.idAkun = b.idAkun").Joins("INNER JOIN "+pkg.PAYMENTTRANSAKSI+" as d ON d.idTransaksi = a.idTransaksi").Where("c.idAkun = ? AND a.noKontrak = ? AND d.angsuranKe IN (?)", idAkun, input.Request.NoKontrak, input.Request.DetailAngsuran).Select("a.status = 'Aktif'").Select("a.status, a.noKontrak, a.otr, a.tglJatuhTempo, SUM(d.jumlahCicilan) as jumlahCicilan, a.idTransaksi").Group("a.idTransaksi").Take(&data)
+	if data.IdTransaksi == 0 {
 		return nil, fmt.Errorf("no kontrak tidak ditemukan")
 	}
 
 	return map[string]interface{}{
-		"va": fmt.Sprintf("%s%s%s", input.Request.NoKontrak, joins, pkg.KodeVerify(2)),
+		"va":     fmt.Sprintf("%s%s%s", input.Request.NoKontrak, joins, pkg.KodeVerify(2)),
+		"jumlah": data.JumlahCicilan,
 	}, nil
 }
 
