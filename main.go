@@ -17,6 +17,7 @@ func main() {
 	}
 	fmt.Printf("REDIS CONNECTED")
 	database.ConectionGORM()
+	database.CronsStart()
 	//go pkg.RunScriptShellBuild()
 	beego.BConfig.RunMode = config.ReadEnv().Server.RunMode
 	beego.Run("localhost:" + config.ReadEnv().Server.HttpPort)

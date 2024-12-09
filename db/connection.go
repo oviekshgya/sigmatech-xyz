@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"fmt"
 	"github.com/beego/beego/v2/core/config"
 	_ "github.com/go-sql-driver/mysql"
@@ -13,6 +14,7 @@ import (
 	"sigmatech-xyz/models/master"
 	"sigmatech-xyz/models/transaksi"
 	"sigmatech-xyz/models/users"
+	"sigmatech-xyz/pkg/cronjobs"
 	"time"
 )
 
@@ -79,4 +81,25 @@ func ConectionGORM() *gorm.DB {
 
 	//SetSessionWithDB(db, "maindb")
 	return DBMain
+}
+
+var (
+	scheduler cronjobs.Scheduler
+)
+
+func CronsStart() {
+
+	var err error
+	scheduler, err = cronjobs.NewScheduler(200)
+	if err != nil {
+		fmt.Println(err)
+	}
+	ctx, _ := context.WithCancel(context.Background())
+	scheduler.Every(1).Seconds().Do(Scheduler, time.Now().Format("15:04"))
+	//scheduler.Every(30).Minutes().Do(SchedulerKhusus, time.Now().Format("15:04"))
+	scheduler.Start(ctx)
+}
+
+func Scheduler(num string) {
+	fmt.Println("INTERVAL RUN 1 SECOND")
 }
