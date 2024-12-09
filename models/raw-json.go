@@ -14,3 +14,10 @@ type JSONValidasiOTP struct {
 		Password string `json:"password"`
 	} `json:"request"`
 }
+
+type JSONLogin struct {
+	Request struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	} `json:"request"`
+}

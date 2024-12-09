@@ -158,3 +158,18 @@ func (service userRepositories) ValidasiOTPCustomers(input models.JSONValidasiOT
 	}
 
 }
+
+func (service userRepositories) Login(input models.JSONLogin) (map[string]interface{}, error) {
+	var data users.AkunCustomer
+	service.DbMain.Where("email = ?", input.Request.Email).First(&data)
+	if data.IdAkun != 0 {
+		hash := []byte(data.Password)
+		if err := bcrypt.CompareHashAndPassword(hash, []byte(input.Request.Password)); err != nil {
+			return nil, fmt.Errorf("email / password salah")
+		}
+		return map[string]interface{}{
+			"idAkun": data.IdAkun,
+		}, nil
+	}
+	return nil, fmt.Errorf("email / password salah")
+}

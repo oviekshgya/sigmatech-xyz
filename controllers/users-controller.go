@@ -7,6 +7,8 @@ import (
 	"github.com/go-playground/validator/v10"
 	"net/http"
 	"sigmatech-xyz/models"
+	"sigmatech-xyz/pkg"
+
 	"sigmatech-xyz/pkg/httpresponses"
 	"sigmatech-xyz/repositories"
 	"sync"
@@ -104,5 +106,39 @@ func (controller UsersController) ValidasiOTPCustomer() {
 	default:
 		appB.Response(http.StatusBadRequest, "Unknown Error", "", nil)
 	}
+}
 
+// Login
+// @Description Login
+// @Param	body	nil	true	"body nill"
+// @Success 200 {int} interfaces{}
+// @Failure 403 bodies are empty
+// @router /login [post]
+func (controller UsersController) Login() {
+	appB := httpresponses.Bee{
+		Ctx: controller.Ctx,
+	}
+	var input models.JSONLogin
+	if err := json.Unmarshal([]byte((controller.Ctx.Input.GetData("RequestBody").(string))), &input); err != nil {
+		fmt.Println("err", err)
+		appB.Response(http.StatusUnprocessableEntity, "", err.Error(), nil)
+		return
+	}
+
+	result, err2 := repositories.StaticUserRepositoris().Login(input)
+	if err2 != nil {
+		appB.Response(http.StatusBadRequest, "", "email / password salah", nil)
+		return
+	}
+
+	create, errCreate := pkg.CreateToken(result["idAkun"].(int))
+	if err2 != nil {
+		appB.Response(http.StatusBadRequest, "", errCreate.Error(), nil)
+		return
+	}
+	appB.Response(http.StatusOK, "Success", "", map[string]interface{}{
+		"accessToken":  create.AccessToken,
+		"refrestToken": create.RefreshToken,
+	})
+	return
 }
