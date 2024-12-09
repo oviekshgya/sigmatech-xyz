@@ -8,9 +8,9 @@ const (
 	SECRETKEY        = "pYJLL6mIaWNtx6Q4m0QIcq8Svzuv57Qp"
 	SECRETREFRESTJWT = "PLSWepO8rqMBPxwQm7qvllxYvoJIdoZ7"
 
-	USERNAME  = "fx5mC88y8QMFEEy6zii7s2X8o4rkAn62212swdasd"
-	PASSWORD  = "sdadasd32ui2jn13we@#EDSFER#sdfsdf"
-	HEADERKEY = "k0iHVwz6dFPwkTxDE8fNZG07hGEh9VWPDSDFS"
+	USERNAME  = "fxi7s2X8o4rkAn62212swdasd"
+	PASSWORD  = "sdadasd32ui2jn13we"
+	HEADERKEY = "k0iHVwzwQm7qvllxYv6dFPwkTx"
 )
 
 const (
@@ -21,4 +21,5 @@ const (
 	MERCHANT         = "master"
 	RATE             = "rate"
 	LOG              = "log"
+	OTPCUSTOMERS     = "otp_customer"
 )

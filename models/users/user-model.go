@@ -38,3 +38,17 @@ type AkunCustomer struct {
 func (AkunCustomer) TableName() string {
 	return pkg.AKUNCUSTOMER
 }
+
+type OTPCustomer struct {
+	IdOtp     int       `gorm:"column:idOtp;primaryKey;autoIncrement" json:"idOtp"`
+	Email     string    `gorm:"column:email;size:255" json:"email"`
+	IsUsed    int       `gorm:"column:isUsed" json:"isUsed"`
+	Kode      string    `gorm:"column:kode;size:255" json:"kode"`
+	ExpiredAt time.Time `gorm:"column:expiredAt;type:datetime" json:"expiredAt"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt time.Time `gorm:"updated_at;autoUpdateTime"`
+}
+
+func (OTPCustomer) TableName() string {
+	return pkg.OTPCUSTOMERS
+}

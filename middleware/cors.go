@@ -17,7 +17,7 @@ func CORS(next beego.FilterFunc) beego.FilterFunc {
 		}
 		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Origin", "*")
 		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Credentials", "true")
-		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, X-ORIGIN, X-SIGNATURE, X-TIMESTAMP, X-ORIGIN, X-TIMESTAMP, X-SIGNATURE, X-ACCESS")
+		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With, X-ORIGIN, X-TIMESTAMP, X-SIGNATURE, X-ACCESS")
 		ctx.ResponseWriter.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
 		headerorigin := ctx.Request.Header.Get("Origin")
 
