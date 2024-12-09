@@ -16,9 +16,13 @@ func init() {
 	beego.InsertFilterChain("/*", middleware.Log)
 	beego.InsertFilterChain("/*", middleware.AuthHeader)
 	beego.InsertFilterChain("/v1/user/request-otp", middleware.AuthBasic)
+	beego.InsertFilterChain("/v1/access", middleware.AuthorizeBaererJWT)
 
 	ns := beego.NewNamespace("/v1",
 		beego.NSNamespace("/user",
+			beego.NSInclude(&controllers.UsersController{}),
+		),
+		beego.NSNamespace("/access",
 			beego.NSInclude(&controllers.UsersController{}),
 		),
 	)

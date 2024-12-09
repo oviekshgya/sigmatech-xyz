@@ -34,4 +34,13 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["sigmatech-xyz/controllers:UsersController"] = append(beego.GlobalControllerRouter["sigmatech-xyz/controllers:UsersController"],
+		beego.ControllerComments{
+			Method:           "VerifikasiAkun",
+			Router:           `/verifikasi`,
+			AllowHTTPMethods: []string{"post"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 }

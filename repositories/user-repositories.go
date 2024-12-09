@@ -173,3 +173,41 @@ func (service userRepositories) Login(input models.JSONLogin) (map[string]interf
 	}
 	return nil, fmt.Errorf("email / password salah")
 }
+
+type VerifikasiJob struct {
+	Result chan interface{}
+	Error  chan error
+}
+
+func (service userRepositories) VerifikasiAkun(idAkun int, input models.JSONVerifikasi, job <-chan VerifikasiJob, wg *sync.WaitGroup) {
+	for i := 1; i <= NumWorkers; i++ {
+		go func() {
+			for jobs := range job {
+				tx := service.DbMain.Begin()
+				defer wg.Done()
+				if created := tx.Create(&users.UserCustomer{
+					IdAkun:       idAkun,
+					CreatedAt:    time.Now(),
+					UpdatedAt:    time.Now(),
+					Nik:          input.Request.Nik,
+					FotoKtp:      input.Request.FotoKtp,
+					FotoSelfie:   input.Request.FotoSelfie,
+					IsAktivasi:   0,
+					LegalName:    input.Request.LegalName,
+					Salary:       input.Request.Salary,
+					TanggalLahir: time.Now(),
+					TempatLahir:  input.Request.TempatLahir,
+				}); created.Error != nil {
+					tx.Rollback()
+					jobs.Error <- fmt.Errorf("insert error:%s", created.Error.Error())
+					return
+				}
+				tx.Commit()
+				jobs.Result <- map[string]interface{}{
+					"insert": true,
+				}
+				return
+			}
+		}()
+	}
+}
