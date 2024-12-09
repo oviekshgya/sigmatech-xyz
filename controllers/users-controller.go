@@ -280,7 +280,7 @@ func (controller UsersController) SimulasiTransaksi() {
 		return
 	}
 
-	var input models.JSONTransaksiSimulasiPengajuan
+	var input models.JSONTransaksiSimulasi
 	if err := json.Unmarshal([]byte((controller.Ctx.Input.GetData("RequestBody").(string))), &input); err != nil {
 		fmt.Println("err", err)
 		appB.Response(http.StatusUnprocessableEntity, "", err.Error(), nil)
@@ -288,6 +288,40 @@ func (controller UsersController) SimulasiTransaksi() {
 	}
 
 	result, err2 := repositories.StaticUserRepositoris().SimulasiTransaksi(meta.Id, input)
+	if err2 != nil {
+		appB.Response(http.StatusBadRequest, "", err2.Error(), nil)
+		return
+	}
+
+	appB.Response(http.StatusOK, "Success", "", result)
+	return
+}
+
+// Transaksi
+// @Description Transaksi
+// @Param	body	nil	true	"body nill"
+// @Success 200 {int} interfaces{}
+// @Failure 403 bodies are empty
+// @router /transaksi [post]
+func (controller UsersController) Transaksi() {
+	appB := httpresponses.Bee{
+		Ctx: controller.Ctx,
+	}
+
+	meta, errMeta := auth.ExtractedExt(controller.Ctx.Request, "")
+	if errMeta != nil {
+		appB.Response(http.StatusUnauthorized, "", errMeta.Error(), nil)
+		return
+	}
+
+	var input models.JSONTransaksiPinjaman
+	if err := json.Unmarshal([]byte((controller.Ctx.Input.GetData("RequestBody").(string))), &input); err != nil {
+		fmt.Println("err", err)
+		appB.Response(http.StatusUnprocessableEntity, "", err.Error(), nil)
+		return
+	}
+
+	result, err2 := repositories.StaticUserRepositoris().Transaksi(meta.Id, input)
 	if err2 != nil {
 		appB.Response(http.StatusBadRequest, "", err2.Error(), nil)
 		return

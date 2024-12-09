@@ -16,13 +16,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type userRepositories struct {
+type UserRepositories struct {
 	beego.Controller
 	DbMain *gorm.DB
 }
 
-func StaticUserRepositoris() *userRepositories {
-	return &userRepositories{
+func StaticUserRepositoris() *UserRepositories {
+	return &UserRepositories{
 		DbMain: database.DBMain,
 	}
 }
@@ -37,7 +37,7 @@ const (
 	QueueSizes = 100
 )
 
-func (service userRepositories) RequestOTPCustomer(input models.JSONRequestOTP, jobs <-chan RequestOTPJobs, wg *sync.WaitGroup) {
+func (service UserRepositories) RequestOTPCustomer(input models.JSONRequestOTP, jobs <-chan RequestOTPJobs, wg *sync.WaitGroup) {
 	for i := 1; i <= NumWorkers; i++ {
 		go func() {
 			for job := range jobs {
@@ -102,7 +102,7 @@ type ValidasiOTPJobs struct {
 	Error  chan error
 }
 
-func (service userRepositories) ValidasiOTPCustomers(input models.JSONValidasiOTP, jobs <-chan ValidasiOTPJobs, wg *sync.WaitGroup) {
+func (service UserRepositories) ValidasiOTPCustomers(input models.JSONValidasiOTP, jobs <-chan ValidasiOTPJobs, wg *sync.WaitGroup) {
 	for i := 1; i <= NumWorkers; i++ {
 		go func() {
 			for job := range jobs {
@@ -161,7 +161,7 @@ func (service userRepositories) ValidasiOTPCustomers(input models.JSONValidasiOT
 
 }
 
-func (service userRepositories) Login(input models.JSONLogin) (map[string]interface{}, error) {
+func (service UserRepositories) Login(input models.JSONLogin) (map[string]interface{}, error) {
 	var data users.AkunCustomer
 	service.DbMain.Where("email = ?", input.Request.Email).First(&data)
 	if data.IdAkun != 0 {
@@ -181,7 +181,7 @@ type VerifikasiJob struct {
 	Error  chan error
 }
 
-func (service userRepositories) VerifikasiAkun(idAkun int, input models.JSONVerifikasi, job <-chan VerifikasiJob, wg *sync.WaitGroup) {
+func (service UserRepositories) VerifikasiAkun(idAkun int, input models.JSONVerifikasi, job <-chan VerifikasiJob, wg *sync.WaitGroup) {
 	for i := 1; i <= NumWorkers; i++ {
 		go func() {
 			for jobs := range job {
@@ -231,7 +231,7 @@ type ProfileJob struct {
 	Error  chan error
 }
 
-func (service userRepositories) Profile(idAkun int, job <-chan ProfileJob, wg *sync.WaitGroup) {
+func (service UserRepositories) Profile(idAkun int, job <-chan ProfileJob, wg *sync.WaitGroup) {
 	for i := 1; i <= NumWorkers; i++ {
 		go func() {
 			for jobs := range job {
@@ -245,7 +245,7 @@ func (service userRepositories) Profile(idAkun int, job <-chan ProfileJob, wg *s
 	}
 }
 
-func (service userRepositories) MasterMerchant(page, pageSize int) (interface{}, error) {
+func (service UserRepositories) MasterMerchant(page, pageSize int) (interface{}, error) {
 	var data []master.MasterMerchants
 	var totalData int64
 	var totalPage int
@@ -282,7 +282,7 @@ func (service userRepositories) MasterMerchant(page, pageSize int) (interface{},
 	}, nil
 }
 
-func (service userRepositories) SimulasiTransaksi(idAkun int, input models.JSONTransaksiSimulasi) (interface{}, error) {
+func (service UserRepositories) SimulasiTransaksi(idAkun int, input models.JSONTransaksiSimulasi) (interface{}, error) {
 
 	var dataMerchant master.MasterMerchants
 	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)
@@ -322,7 +322,7 @@ func (service userRepositories) SimulasiTransaksi(idAkun int, input models.JSONT
 	}, nil
 }
 
-func (service userRepositories) Transaksi(idAkun int, input models.JSONTransaksi) (interface{}, error) {
+func (service UserRepositories) Transaksi(idAkun int, input models.JSONTransaksiPinjaman) (interface{}, error) {
 	var dataMerchant master.MasterMerchants
 	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)
 
