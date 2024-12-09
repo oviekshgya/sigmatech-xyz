@@ -281,14 +281,14 @@ func (service userRepositories) SimulasiTransaksi(idAkun int, input models.JSONT
 
 	var a = 1
 	tgljt := time.Now().AddDate(0, 0, 30)
-	for i := 0; i < input.Request.Tenor; i++ {
+	for i := 0; i < input.Request.Tenor*12; i++ {
 
 		paymentSchedule = append(paymentSchedule, map[string]interface{}{
-			"angsuranKe":    a + 1,
+			"angsuranKe":    a,
 			"bunga":         dataRate.Rate / 12,
 			"tanggal":       time.Now(),
 			"tglJatuhTempo": tgljt,
-			"jumlahCicilan": input.Request.OTR / float64(input.Request.Tenor),
+			"jumlahCicilan": input.Request.OTR / float64(input.Request.Tenor) * 12,
 			"totalCicilan":  (input.Request.OTR / float64(input.Request.Tenor)) + input.Request.OTR*((dataRate.Rate/12)/100)*float64(input.Request.Tenor),
 			"status":        "ready",
 		})
