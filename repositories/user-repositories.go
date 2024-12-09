@@ -208,7 +208,7 @@ func (service UserRepositories) VerifikasiAkun(idAkun int, input models.JSONVeri
 				if created := tx.Create(&users.UserLimits{
 					CreatedAt:      time.Now(),
 					UpdatedAt:      time.Now(),
-					Limit:          100000,
+					Limit:          input.Request.Salary * 70 / 100,
 					IdUserCustomer: dataCreated.IdUserCustomer,
 				}); created.Error != nil {
 					tx.Rollback()
