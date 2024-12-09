@@ -409,7 +409,8 @@ func (service UserRepositories) CheckPengajuan(idAkun int, noKontrak string) (in
 	return &data, nil
 }
 
-func (service UserRepositories) PaymentAngsuran(idAkun int, input models.JSONTransaksiPelunasan) (interface{}, error) {
+func (service UserRepositories) PaymentAngsuran(idAkun int, input models.JSONTransaksiPayment) (interface{}, error) {
+	go pkg.PublishTransactionStatus(input.Request.NoKontrak, fmt.Sprintf("payment-%v", input.Request.DetailAngsuran))
 	/*var dataMerchant master.MasterMerchants
 	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)
 

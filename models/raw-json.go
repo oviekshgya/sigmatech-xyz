@@ -62,7 +62,7 @@ type JSONTransaksiPinjaman struct {
 	} `json:"request"`
 }
 
-type JSONTransaksiPelunasan struct {
+type JSONTransaksiPayment struct {
 	Request struct {
 		NoKontrak      string `json:"noKontrak"`
 		DetailAngsuran []int  `json:"detailAngsuran"`
