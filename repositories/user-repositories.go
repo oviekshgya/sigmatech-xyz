@@ -5,6 +5,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	database "sigmatech-xyz/db"
 	"sigmatech-xyz/models"
+	"sigmatech-xyz/models/master"
 	"sigmatech-xyz/models/users"
 	"sigmatech-xyz/pkg"
 	"sync"
@@ -229,4 +230,41 @@ func (service userRepositories) Profile(idAkun int, job <-chan ProfileJob, wg *s
 			}
 		}()
 	}
+}
+
+func (service userRepositories) MasterMerchant(page, pageSize int) (interface{}, error) {
+	var data []master.MasterMerchants
+	var totalData int64
+	var totalPage int
+
+	switch {
+	case pageSize > 100:
+		pageSize = pageSize
+	case pageSize <= 0:
+		pageSize = 10
+	}
+
+	service.DbMain.Scopes(models.Pagination(pageSize, page)).Where("isActive = 1").Order("namaMerchant DESC").Find(&data)
+	service.DbMain.Where("isActive = 1").Count(&totalData)
+
+	if int(totalData) < pageSize {
+		totalPage = 1
+	} else {
+		totalPage = int(totalData) / pageSize
+		if (int(totalData) % pageSize) != 0 {
+			totalPage = totalPage + 1
+		}
+	}
+
+	if page == 0 {
+		page = 1
+	}
+
+	return map[string]interface{}{
+		"page":      page,
+		"pageSize":  pageSize,
+		"data":      data,
+		"total":     totalData,
+		"totalPage": totalPage,
+	}, nil
 }

@@ -52,4 +52,13 @@ func init() {
 			Filters:          nil,
 			Params:           nil})
 
+	beego.GlobalControllerRouter["sigmatech-xyz/controllers:UsersController"] = append(beego.GlobalControllerRouter["sigmatech-xyz/controllers:UsersController"],
+		beego.ControllerComments{
+			Method:           "MasterMerchant",
+			Router:           `/master-merchant`,
+			AllowHTTPMethods: []string{"get"},
+			MethodParams:     param.Make(),
+			Filters:          nil,
+			Params:           nil})
+
 }

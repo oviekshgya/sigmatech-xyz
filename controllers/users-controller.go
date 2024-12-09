@@ -6,9 +6,10 @@ import (
 	beego "github.com/beego/beego/v2/server/web"
 	"github.com/go-playground/validator/v10"
 	"net/http"
-	"sigmatech-xyz/models"
+
 	"sigmatech-xyz/pkg"
 	"sigmatech-xyz/pkg/auth"
+	"strconv"
 
 	"sigmatech-xyz/pkg/httpresponses"
 	"sigmatech-xyz/repositories"
@@ -231,4 +232,32 @@ func (controller UsersController) Profile() {
 	default:
 		appB.Response(http.StatusBadRequest, "Unknown Error", "", nil)
 	}
+}
+
+// MasterMerchant
+// @Description MasterMerchant
+// @Param	body	nil	true	"body nill"
+// @Success 200 {int} interfaces{}
+// @Failure 403 bodies are empty
+// @router /master-merchant [get]
+func (controller UsersController) MasterMerchant() {
+	appB := httpresponses.Bee{
+		Ctx: controller.Ctx,
+	}
+
+	_, errMeta := auth.ExtractedExt(controller.Ctx.Request, "")
+	if errMeta != nil {
+		appB.Response(http.StatusUnauthorized, "", errMeta.Error(), nil)
+		return
+	}
+	page, _ := strconv.Atoi(controller.Ctx.Input.Query("page"))
+	pageSize, _ := strconv.Atoi(controller.Ctx.Input.Query("pageSize"))
+	result, err2 := repositories.StaticUserRepositoris().MasterMerchant(page, pageSize)
+	if err2 != nil {
+		appB.Response(http.StatusBadRequest, "", "email / password salah", nil)
+		return
+	}
+
+	appB.Response(http.StatusOK, "Success", "", result)
+	return
 }
