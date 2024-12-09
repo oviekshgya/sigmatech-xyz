@@ -19,6 +19,7 @@ type Transaksi struct {
 	Status         string    `gorm:"column:status;size:200" json:"status"`
 	CreatedAt      time.Time `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt      time.Time `gorm:"updated_at;autoUpdateTime"`
+	TglJatuhTempo  time.Time `gorm:"column:tglJatuhTempo;type:date"`
 }
 
 type PaymentTransaksi struct {
@@ -41,4 +42,12 @@ func (Transaksi) TableName() string {
 
 func (PaymentTransaksi) TableName() string {
 	return pkg.PAYMENTTRANSAKSI
+}
+
+type DataTransaksi struct {
+	Status        string    `gorm:"column:status;size:200" json:"status"`
+	NoKontrak     string    `gorm:"column:noKontrak;size:200" json:"noKontrak"`
+	OTR           float64   `gorm:"column:otr;type:double" json:"otr"`
+	TglJatuhTempo time.Time `gorm:"column:tglJatuhTempo;type:date"`
+	JumlahCicilan float64   `gorm:"column:jumlahCicilan;type:double" json:"jumlahCicilan"`
 }

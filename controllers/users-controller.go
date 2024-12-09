@@ -330,3 +330,30 @@ func (controller UsersController) Transaksi() {
 	appB.Response(http.StatusOK, "Success", "", result)
 	return
 }
+
+// CheckPengajuan
+// @Description CheckPengajuan
+// @Param	body	nil	true	"body nill"
+// @Success 200 {int} interfaces{}
+// @Failure 403 bodies are empty
+// @router /check-transaksi/:noKontrak [get]
+func (controller UsersController) CheckPengajuan() {
+	appB := httpresponses.Bee{
+		Ctx: controller.Ctx,
+	}
+
+	meta, errMeta := auth.ExtractedExt(controller.Ctx.Request, "")
+	if errMeta != nil {
+		appB.Response(http.StatusUnauthorized, "", errMeta.Error(), nil)
+		return
+	}
+
+	result, err2 := repositories.StaticUserRepositoris().CheckPengajuan(meta.Id, controller.Ctx.Input.Param(":noKontrak"))
+	if err2 != nil {
+		appB.Response(http.StatusBadRequest, "", err2.Error(), nil)
+		return
+	}
+
+	appB.Response(http.StatusOK, "Success", "", result)
+	return
+}

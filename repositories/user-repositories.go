@@ -327,8 +327,8 @@ func (service UserRepositories) Transaksi(idAkun int, input models.JSONTransaksi
 	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)
 
 	var dataLimit users.UserLimits
-	if service.DbMain.Table(pkg.AKUNCUSTOMER+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idAkun = a.idAkun").Joins("INNER JOIN "+pkg.USERLIMIT+" as c ON c.idUserCustomer = b.idUserCustomer").Where("b.idUserCustomer = ?", idAkun).Select("c.limit, b.idUserCustomer").First(&dataLimit); input.Request.OTR > dataLimit.Limit {
-		return nil, fmt.Errorf("maaf transaksi anda melebihi limit transaksi %f", dataLimit.Limit)
+	if service.DbMain.Table(pkg.AKUNCUSTOMER+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idAkun = a.idAkun").Joins("INNER JOIN "+pkg.USERLIMIT+" as c ON c.idUserCustomer = b.idUserCustomer").Where("a.idAkun = ?", idAkun).Select("c.limit, b.idUserCustomer").Take(&dataLimit); input.Request.OTR > dataLimit.Limit {
+		return nil, fmt.Errorf("maaf transaksi anda melebihi limit transaksi %0.2f", dataLimit.Limit)
 	}
 
 	var dataRate master.MasterRates
@@ -349,6 +349,7 @@ func (service UserRepositories) Transaksi(idAkun int, input models.JSONTransaksi
 		JumlahCicilan:  input.Request.OTR / float64(input.Request.Tenor) * 12,
 		NoKontrak:      pkg.KodeVerify(10),
 		Status:         "Pengajuan",
+		TglJatuhTempo:  time.Now().AddDate(input.Request.Tenor, 0, 0),
 	}
 
 	if created := tx.Create(&dataCreated); created.Error != nil {
@@ -394,4 +395,10 @@ func (service UserRepositories) Transaksi(idAkun int, input models.JSONTransaksi
 		"paymanetSchedule":   paymentTransaksi,
 		"rate":               dataRate.Rate,
 	}, nil
+}
+
+func (service UserRepositories) CheckPengajuan(idAkun int, noKontrak string) (interface{}, error) {
+	var data transaksi.DataTransaksi
+	service.DbMain.Table(pkg.TRANSACTION+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idUserCustomer = a.idUserCustomer").Joins("INNER JOIN "+pkg.AKUNCUSTOMER+" as c ON c.idAkun = b.idAkun").Where("c.idAkun = ? AND a.noKontrak = ?", idAkun, noKontrak).Select("a.status = 'Aktif'").Select("a.status, a.noKontrak, a.otr, a.tglJatuhTempo, a.jumlahCicilan").Take(&data)
+	return &data, nil
 }
