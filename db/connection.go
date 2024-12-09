@@ -109,5 +109,19 @@ func Scheduler(num string) {
 		tx.Rollback()
 		return
 	}
+
+	if created := tx.Table("transaksi").Where("status = ? ", "Pengajuan").Updates(map[string]interface{}{
+		"status": "Aktif",
+	}); created.Error != nil {
+		tx.Rollback()
+		return
+	}
+
+	if created := tx.Table("payment_transaksi").Where("status = ? ", "Pengajuan").Updates(map[string]interface{}{
+		"status": "Aktif",
+	}); created.Error != nil {
+		tx.Rollback()
+		return
+	}
 	tx.Commit()
 }
