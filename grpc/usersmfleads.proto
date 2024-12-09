@@ -1,0 +1,199 @@
+syntax = "proto3";
+
+option go_package = "/pb";
+
+service GreetingService {
+  rpc Greeting(GreetingServiceRequest) returns (GreetingServiceReply) {}
+  rpc StatusTaskString(StatusTaskStringRequest) returns(StatusTaskStringReplay) {}
+  rpc DetailStatusTask(DetailStatusRequest) returns(DetailStatusTaskReplay) {}
+  rpc AddNotifikasiSurveyor(AddNotifikasiSurveyorJsonRequst) returns (AddNotifikasiSurveyorReplay) {}
+  rpc SMSDanain(SMSDanainRequest) returns(SMSDanainReplay) {}
+  rpc BasicDataSurveyor(UserSurveyorRequest) returns (UserSurveyorReplay) {}
+}
+
+message GreetingServiceRequest {
+  string name = 1;
+}
+
+message GreetingServiceReply {
+  string message = 2;
+}
+
+message StatusTaskStringReplay {
+  string status = 1;
+}
+
+message StatusTaskStringRequest {
+  int64 idTaskPengajuan = 1;
+}
+
+message Pencairan {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
+
+message Pendanaan {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
+
+message PenerimaanBPKB {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
+
+message KonfirmasiPengajuan {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
+
+message ApproveKomite {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
+
+message ApproveCreditAnalis {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+  string WordingPerubahan = 6 ;
+}
+
+message ApproveKacab {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
+
+message PengisianData {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
+
+message KonfirmasiKedatangan {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
+
+message Assigment {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
+
+message DetailStatusTaskReplay {
+  Pencairan Pencairan = 1;
+  Pendanaan Pendanaan = 2;
+  PenerimaanBPKB PenerimaanBPKB = 3;
+  KonfirmasiPengajuan KonfirmasiPengajuan = 4;
+  ApproveKomite ApproveKomite = 5;
+  ApproveCreditAnalis ApproveCreditAnalis = 6;
+  ApproveKacab ApproveKacab = 7;
+  PengisianData PengisianData = 8;
+  KonfirmasiKedatangan KonfirmasiKedatangan = 9;
+  Assigment Assign = 10;
+  PenyerahanBPKB PenyerahanBPKB = 11;
+    ApproveKacabPerubahan ApproveKacabPerubahan = 12;
+}
+
+message DetailStatusRequest {
+  int64 IdTaskPengajuan = 1;
+}
+
+message AddNotifikasiSurveyorJson {
+  int64 IdNotifikasi = 1;
+  int64 IdUserSurveyor=2;
+  string Judul = 3;
+  string Deskripsi = 4;
+  int64 IsRead = 5;
+  string  Date = 6;
+}
+
+message AddNotifikasiSurveyorJsonRequst {
+  AddNotifikasiSurveyorJson Input = 1;
+}
+
+message AddNotifikasiSurveyorReplay {
+    AddNotifikasiSurveyorJson Item = 1;
+}
+
+message SMSDanain {
+  string Wording = 1;
+  string Hp = 2;
+  string GoKey = 3;
+}
+
+message SMSDanainRequest {
+  string Wording = 1;
+  string Hp = 2;
+  string GoKey = 3;
+}
+
+message SMSDanainReplay {
+  string Wording = 1;
+  string Hp = 2;
+  string GoKey = 3;
+  string Status = 4;
+}
+
+message UserSurveyor {
+  int64 Id = 1;
+  string Email = 2;
+  string Nik = 3;
+  string Username = 4;
+  int64 IdJabatan = 5;
+  int64 IdCabang = 6;
+}
+
+message UserSurveyorRequest {
+  int64  Id  = 1;
+}
+
+message UserSurveyorReplay {
+    UserSurveyor BasicData = 1;
+}
+
+message PenyerahanBPKB {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+  int64  IsPenyerahan = 6;
+  string Mitra=7;
+}
+
+message ApproveKacabPerubahan {
+  string Date = 1;
+  string Keterangan = 2;
+  string StatusApk = 3;
+  string StatusWeb = 4;
+  int64 IsStatus = 5;
+}
