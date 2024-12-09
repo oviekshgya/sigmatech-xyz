@@ -9,6 +9,7 @@ import (
 	"sigmatech-xyz/models/transaksi"
 	"sigmatech-xyz/models/users"
 	"sigmatech-xyz/pkg"
+	"strings"
 	"sync"
 	"time"
 
@@ -410,16 +411,11 @@ func (service UserRepositories) CheckPengajuan(idAkun int, noKontrak string) (in
 }
 
 func (service UserRepositories) PaymentAngsuran(idAkun int, input models.JSONTransaksiPayment) (interface{}, error) {
-	go pkg.PublishTransactionStatus(input.Request.NoKontrak, fmt.Sprintf("payment-%v", input.Request.DetailAngsuran))
-	/*var dataMerchant master.MasterMerchants
-	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)
+	joins := strings.Join(input.Request.DetailAngsuran, "")
 
-	var dataLimit users.UserLimits
-	if service.DbMain.Table(pkg.AKUNCUSTOMER+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idAkun = a.idAkun").Joins("INNER JOIN "+pkg.USERLIMIT+" as c ON c.idUserCustomer = b.idUserCustomer").Where("a.idAkun = ?", idAkun).Select("c.limit, b.idUserCustomer").Take(&dataLimit); input.Request.OTR > dataLimit.Limit {
-		return nil, fmt.Errorf("maaf transaksi anda melebihi limit transaksi %0.2f", dataLimit.Limit)
-	}*/
-
-	return nil, nil
+	return map[string]interface{}{
+		"va": fmt.Sprintf("%s%s%s", input.Request.NoKontrak, joins, pkg.KodeVerify(2)),
+	}, nil
 }
 
 func (service UserRepositories) CheckPayment(idAkun, angsurnaKe int, noKontrak string) (interface{}, error) {
