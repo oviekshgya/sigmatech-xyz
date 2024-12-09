@@ -408,3 +408,15 @@ func (service UserRepositories) CheckPengajuan(idAkun int, noKontrak string) (in
 
 	return &data, nil
 }
+
+func (service UserRepositories) PaymentAngsuran(idAkun int, input models.JSONTransaksiPelunasan) (interface{}, error) {
+	/*var dataMerchant master.MasterMerchants
+	service.DbMain.Where("isActive = 1").Order("namaMerchant DESC").First(&dataMerchant)
+
+	var dataLimit users.UserLimits
+	if service.DbMain.Table(pkg.AKUNCUSTOMER+" as a").Joins("INNER JOIN "+pkg.USERSCUSTOMER+" as b ON b.idAkun = a.idAkun").Joins("INNER JOIN "+pkg.USERLIMIT+" as c ON c.idUserCustomer = b.idUserCustomer").Where("a.idAkun = ?", idAkun).Select("c.limit, b.idUserCustomer").Take(&dataLimit); input.Request.OTR > dataLimit.Limit {
+		return nil, fmt.Errorf("maaf transaksi anda melebihi limit transaksi %0.2f", dataLimit.Limit)
+	}*/
+
+	return nil, nil
+}

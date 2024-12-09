@@ -61,3 +61,10 @@ type JSONTransaksiPinjaman struct {
 		IdMerchant int     `json:"idMerchant"`
 	} `json:"request"`
 }
+
+type JSONTransaksiPelunasan struct {
+	Request struct {
+		NoKontrak      string `json:"noKontrak"`
+		DetailAngsuran []int  `json:"detailAngsuran"`
+	} `json:"request"`
+}
